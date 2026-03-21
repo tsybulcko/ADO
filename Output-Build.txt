@@ -1,0 +1,5 @@
+﻿Build started at 0:09...
+1>------ Build started: Project: ADO, Configuration: Debug Any CPU ------
+1>  ADO -> C:\Users\roman\source\repos\ADO\ADO\bin\Debug\ADO.exe
+========== Build: 1 succeeded, 0 failed, 0 up-to-date, 0 skipped ==========
+========== Build completed at 0:09 and took 07,845 seconds ==========
