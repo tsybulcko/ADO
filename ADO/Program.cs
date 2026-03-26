@@ -5,6 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Data.SqlClient;
 using System.ComponentModel.Design;
+using System.IO;
+
+
 
 
 namespace ADO
@@ -18,14 +21,22 @@ namespace ADO
 			
 			Connector connector = new Connector(connection_string);
 
+			connector.Insert("INSERT Directors (first_name,last_name) VALUES (N'Guy', N'Richie');");
 
-			string cmd = "SELECT movie_id,title,release_date,first_name,last_name FROM Movies,Directors WHERE director=director_id";
-			
-			connector.Select(cmd);
-			Console.WriteLine($"Количество записей: {connector.Scalar("SELECT COUNT(*) FROM Movies")}");
+			Console.WriteLine($"PK MAX:\t{connector.GetMaxPrimareyKey("Directors")}");
 
-			connector.Select("SELECT * FROM Directors");
+			//string cmd = "SELECT movie_id,title,release_date,first_name,last_name FROM Movies,Directors WHERE director=director_id";
+			//connector.Select(cmd);
+			connector.Select("*", "Directors");
 			Console.WriteLine($"Количество записей: {connector.Scalar("SELECT COUNT(*) FROM Directors")}");
+			connector.Select("SELECT * FROM Directors");
+			connector.Select
+				(
+				"title,release_date,first_name,last_name",
+				"Movies,Directors",
+				"director = director_id"
+				);
+			Console.WriteLine($"Количество записей: {connector.Scalar("SELECT COUNT(*) FROM Movies")}");
 		
 			//command.CommandText = "SELECT COUNT(*) FROM Movies";
 			//Console.WriteLine($"Количетво записей:\t{command.ExecuteScalar()}");
