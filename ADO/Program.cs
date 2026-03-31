@@ -21,15 +21,22 @@ namespace ADO
 			
 			Connector connector = new Connector(connection_string);
 
-			connector.Insert("INSERT Directors (first_name,last_name) VALUES (N'Guy', N'Richie');");
+			Console.WriteLine(connector.GetPrimarykeyColunnName("Directors"));
+			Console.WriteLine(connector.GetPrimarykeyColunnName("Movies"));
+
+			//connector.Insert($@"INSERT Directors (director_id,first_name,last_name) VALUES ({connector.GetNextPrimaryKey("Directors")}, N'Guy', N'Richie');");
+
+			connector.Insert("Directors","director_id,first_name,last_name",$"{connector.GetNextPrimaryKey("Directors")},John,Singleton");
 
 			Console.WriteLine($"PK MAX:\t{connector.GetMaxPrimareyKey("Directors")}");
+			
 
 			//string cmd = "SELECT movie_id,title,release_date,first_name,last_name FROM Movies,Directors WHERE director=director_id";
 			//connector.Select(cmd);
+
 			connector.Select("*", "Directors");
 			Console.WriteLine($"Количество записей: {connector.Scalar("SELECT COUNT(*) FROM Directors")}");
-			connector.Select("SELECT * FROM Directors");
+			
 			connector.Select
 				(
 				"title,release_date,first_name,last_name",
