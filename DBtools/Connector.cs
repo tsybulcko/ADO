@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Data.SqlClient;
+using System.Data;
 
 namespace DBtools
 {
@@ -19,30 +20,40 @@ namespace DBtools
 				connection = new SqlConnection(connection_string);
 
 			}
-			public void Select(string cmd)
+			public DataTable Select(string cmd)
 			{
+			    DataTable table = new DataTable();
 				connection.Open();
 				SqlCommand command = new SqlCommand(cmd, connection);
 				SqlDataReader reader = command.ExecuteReader();
-				for (int i = 0; i < reader.FieldCount; i++)
-					Console.Write(reader.GetName(i) + "\t");
+			for (int i = 0; i < reader.FieldCount; i++)
+			{
+				Console.Write(reader.GetName(i) + "\t");
+				table.Columns.Add(reader.GetName(i));
+			}
 				Console.WriteLine();
 				while (reader.Read())
 				{
+				DataRow row = table.NewRow();   //Создали строку
 					//Console.WriteLine($"{reader[0]}\t{reader[1]}\t{reader[2]}\t{reader[3]}");
 					for (int i = 0; i < reader.FieldCount; i++)
+				    {
+					    row[i] = reader[i]; //Заполнили строку значениями
 						Console.Write($"{reader[i]}\t\t");
+				    }
 					Console.WriteLine();
+				    table.Rows.Add(row); //Добавили заполненную строку в таблицу
 				}
 				reader.Close();
 				connection.Close();
+			    return table;
 			}
-			public void Select(string fields, string tables, string condition = "")
+			public DataTable Select(string fields, string tables, string condition = "")
 			{
 				string cmd = $"SELECT {fields} FROM {tables}";
 				if (condition != "") cmd += $" WHERE {condition}";
 				cmd += ";";
-				Select(cmd);
+				return Select(cmd);
 			}
 			public object Scalar(string cmd)
 			{
