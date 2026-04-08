@@ -13,14 +13,50 @@ namespace Aacademy
 {
 	public partial class MainForm : Form
 	{
+		Query[] queries =
+		{
+			new Query
+				(
+				"last_name,first_name,middle_name,group_name,direction_name",
+				"Students,Groups,Directions",
+				"[group]=group_id AND direction=direction_id"
+				),
+			new Query
+				(
+				"*",
+				"Groups,Directions",
+				"direction=direction_id"
+				),
+			new Query("*", "Directions"),
+			new Query("*", "Disciplines"),
+			new Query("*", "Teachers"),
+		};
+		string[] status_messages =
+		{
+			"Количество студентов",
+			"Количество групп",
+			"Количество направлений",
+			"Количество дициплин",
+			"Количекство преподавателей"
+		};
+		DataGridView[] tablis;
 		DBtools.Connector connector;
 		public MainForm()
 		{
 			InitializeComponent();
+			tablis = new DataGridView[] { dgvStudents, dgvGroups, dgvDirections, dgvDisciplines, dgvTeachers };
 			connector = new DBtools.Connector(ConfigurationManager.ConnectionStrings["PV_521_Import"].ConnectionString);
-			dgvDirections.DataSource = connector.Select("*", "Directions");
-			toolStripStatusLabel.Text = $"Количество направлений обучения: {dgvDirections.Rows.Count - 1}";
+			//dgvDirections.DataSource = connector.Select("*", "Directions");
+			//toolStripStatusLabel.Text = $"Количество направлений обучения: {dgvDirections.Rows.Count - 1}";
 			//toolStripStatusLabel.Text = $"Количество направлений обучения: {connector.Scalar("SELECT COUNT(*) FROM Directions")}";
+			tabControl_SelectedIndexChanged(tabControl, null);
+		}
+
+		private void tabControl_SelectedIndexChanged(object sender, EventArgs e)
+		{
+			int i = tabControl.SelectedIndex;
+			tablis[i].DataSource = connector.Select(queries[i].ToString());
+			toolStripStatusLabel.Text = $"{status_messages[i]} : {tablis[i].RowCount - 1}";
 		}
 	}
 }
