@@ -41,6 +41,10 @@ namespace Aacademy
 		};
 		DataGridView[] tablis;
 		DBtools.Connector connector;
+
+		/// /////////////////////////////////////////////////////////////
+		Dictionary<string, int> d_directions;
+		Dictionary<string, int> d_groups;
 		public MainForm()
 		{
 			InitializeComponent();
@@ -50,6 +54,15 @@ namespace Aacademy
 			//toolStripStatusLabel.Text = $"Количество направлений обучения: {dgvDirections.Rows.Count - 1}";
 			//toolStripStatusLabel.Text = $"Количество направлений обучения: {connector.Scalar("SELECT COUNT(*) FROM Directions")}";
 			tabControl_SelectedIndexChanged(tabControl, null);
+
+			d_directions = connector.GetDictionary("Directions");
+			d_groups = connector.GetDictionary("Groups");
+
+
+			cbStudentsGroup.Items.AddRange(d_groups.Keys.ToArray());
+			cbGroupsDirection.Items.AddRange(d_directions.Keys.ToArray());
+			cbGroupsDirection.SelectedIndexChanged += new EventHandler(cbGroupsDirection_SelectedIndexChanged);
+			cbStudentsDirection.Items.AddRange(d_directions.Keys.ToArray());
 		}
 
 		private void tabControl_SelectedIndexChanged(object sender, EventArgs e)
@@ -57,6 +70,33 @@ namespace Aacademy
 			int i = tabControl.SelectedIndex;
 			tablis[i].DataSource = connector.Select(queries[i].ToString());
 			toolStripStatusLabel.Text = $"{status_messages[i]} : {tablis[i].RowCount - 1}";
+		}
+
+		private void cbGroupsDirection_SelectedIndexChanged(object sender, EventArgs e)
+		{
+			dgvGroups.DataSource = connector.Select
+				(
+				queries[1].ToString() +
+				$" AND direction={d_directions[cbGroupsDirection.SelectedItem.ToString()]}"
+				);
+			toolStripStatusLabel.Text = $"{status_messages[1]}: {dgvGroups.RowCount - 1}";
+		}
+
+		private void cbStudentsDirection_SelectedIndexChanged(object sender, EventArgs e)
+		{
+			d_groups = connector.GetDictionary
+				(
+				"Groups",
+				$"direction={d_directions[cbStudentsDirection.SelectedItem.ToString()]}"
+				);
+			cbStudentsGroup.Items.Clear();
+			cbStudentsGroup.Items.AddRange(d_groups.Keys.ToArray());
+			dgvStudents.DataSource = connector.Select
+				 (
+				 queries[0].ToString()+
+				 $" AND direction={d_directions[cbStudentsDirection.SelectedItem.ToString()]}"
+				 );
+			toolStripStatusLabel.Text = $"{status_messages[0]}: {dgvStudents.RowCount - 1}";
 		}
 	}
 }

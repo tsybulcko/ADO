@@ -1,1 +1,2 @@
-﻿SELECT title,release_date,first_name,last_name FROM Movies,Directors WHERE director = director_id;
+﻿SELECT * FROM Groups,Directi0,
+ons WHERE direction=direction_id AND directions=5  
