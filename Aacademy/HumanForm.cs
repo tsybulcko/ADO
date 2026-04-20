@@ -8,13 +8,16 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
+using System.Configuration;
+
 namespace Aacademy
 {
-	public partial class HumanForm : Form
+	public abstract partial class HumanForm : Form
 	{
 		public HumanForm()
 		{
 			InitializeComponent();
+			
 		}
 
 		private void buttonBrowse_Click(object sender, EventArgs e)
@@ -22,9 +25,8 @@ namespace Aacademy
 
 		}
 
-		private void button1_Click(object sender, EventArgs e)
-		{
+		protected abstract void buttonOK_Click(object sender, EventArgs e);
 
-		}
+	
 	}
 }

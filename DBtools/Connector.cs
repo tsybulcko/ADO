@@ -97,12 +97,12 @@ namespace DBtools
 			{
 				return GetMaxPrimareyKey(table) + 1;
 			}
-			public string GetPrimarykeyColunnName(string table)
+			public string GetPrimarykeyColumnName(string table)
 			{
 				string raw = @"Raw string"; // Raw - строка игнорирует переносы.
 				string cmd = $@"SELECT INFORMATION_SCHEMA.KEY_COLUMN_USAGE.COLUMN_NAME
             FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE
-            WHERE TABLE_NAME=N'{table}'
+            WHERE TABLE_NAME = N'{table}'
             AND CONSTRAINT_NAME LIKE N'PK_%'";
 				return (string)Scalar(cmd);
 			}
@@ -143,7 +143,7 @@ namespace DBtools
 						parsed_values += ",";
 					}
 				}
-				string cmd = $"IF NOT EXISTS (SELECT {GetPrimarykeyColunnName(table)} FROM {table} WHERE {condition})";
+				string cmd = $"IF NOT EXISTS (SELECT {GetPrimarykeyColumnName(table)} FROM {table} WHERE {condition})";
 				cmd += $"INSERT {table}({fields}) VALUES ({parsed_values})";
 				Insert(cmd);
 			}

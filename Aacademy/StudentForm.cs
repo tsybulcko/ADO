@@ -15,6 +15,35 @@ namespace Aacademy
 		public StudentForm()
 		{
 			InitializeComponent();
+
+			tbLastName.Text = "Жук";
+			tbFirstName.Text = "Василий";
+			tbMiddleName.Text = "Петрович";
+			dtpBirthDate.Text = "24.10.1977";
+			tbEmail.Text = "bazilik_spb@mail.ru";
+			tbPhone.Text = "+7(911)024-56-78";
+
+			DataTable groups = DataBase.Connector.Select("SELECT * FROM Groups"); //Получаем DataTable.
+			cbGroup.DataSource = groups;
+			cbGroup.DisplayMember = "group_name";
+			cbGroup.ValueMember = "group_id";
+		}
+		/*protected override void buttonOK_Click(object sender, EventArgs e)
+		{
+			DataBase.Connector.Insert
+				(
+				"Students",
+				"last_name,first_name,middle_name,birth_date,email,phone,[group]",
+				$"{}"
+		*/
+		protected override void buttonOK_Click(object sender, EventArgs e)
+		{
+			DataBase.Connector.Insert
+				(
+				"Students",
+				"last_name,first_name,middle_name,birth_date,email,phone,[group]",
+				$"{tbLastName.Text},{tbFirstName.Text},{tbMiddleName.Text},{dtpBirthDate.Value.ToString("dd-MM-yyyy")},{tbEmail.Text},{tbPhone.Text},{cbGroup.SelectedValue}"
+				);
 		}
 	}
 }
