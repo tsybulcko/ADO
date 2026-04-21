@@ -25,7 +25,7 @@ namespace Aacademy
 
 		}
 
-		protected abstract void buttonOK_Click(object sender, EventArgs e);
+		protected abstract void ButtonOK_Click(object sender, EventArgs e);
 
 	
 	}

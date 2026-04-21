@@ -136,12 +136,14 @@ namespace DBtools
 				for (int i = 1; i < s_fields.Length; i++)
 				{
 					condition += $" {s_fields[i]}=N'{s_values[i]}' ";
+				if (s_values[i].Length > 1)
 					parsed_values += s_values[i][0] != 'N' && s_values[i][1] != '\'' ? $"N'{s_values[i]}'" : s_values[i];
+				else parsed_values += s_values[i];
 					if (i != s_fields.Length - 1)
-					{
-						condition += "AND";
-						parsed_values += ",";
-					}
+				{
+					condition += "AND";
+					parsed_values += ",";
+				}
 				}
 				string cmd = $"IF NOT EXISTS (SELECT {GetPrimarykeyColumnName(table)} FROM {table} WHERE {condition})";
 				cmd += $"INSERT {table}({fields}) VALUES ({parsed_values})";
