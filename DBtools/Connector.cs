@@ -97,7 +97,7 @@ namespace DBtools
 			{
 				return GetMaxPrimareyKey(table) + 1;
 			}
-			public string GetPrimarykeyColumnName(string table)
+			public string GetPrimaryKeyColumnName(string table)
 			{
 				string raw = @"Raw string"; // Raw - строка игнорирует переносы.
 				string cmd = $@"SELECT INFORMATION_SCHEMA.KEY_COLUMN_USAGE.COLUMN_NAME
@@ -132,21 +132,24 @@ namespace DBtools
 				string condition = "";
 				string[] s_fields = fields.Split(',');
 				string[] s_values = values.Split(',');
-				string parsed_values = $"N'{s_values[0]}',";
-				for (int i = 1; i < s_fields.Length; i++)
+			    string parsed_fields = "";
+			    string parsed_values = "";//$"N'{s_values[0]}',";
+				for (int i = s_fields[0].Contains("_id") ? 1 : 0; i < s_fields.Length; i++)
 				{
+				    if (s_values[i] == "") continue;
 					condition += $" {s_fields[i]}=N'{s_values[i]}' ";
-				if (s_values[i].Length > 1)
-					parsed_values += s_values[i][0] != 'N' && s_values[i][1] != '\'' ? $"N'{s_values[i]}'" : s_values[i];
-				else parsed_values += s_values[i];
-					if (i != s_fields.Length - 1)
-				{
-					condition += "AND";
-					parsed_values += ",";
+				    parsed_fields += s_fields[i];
+				    if (i != s_fields.Length - 1) parsed_fields += ",";
+					parsed_values += s_values[i].Length > 1 && s_values[i][0] != 'N' && s_values[i][1] != '\'' ? $"N'{s_values[i]}'" : s_values[i];
+
+				    if (i != s_fields.Length - 1)
+				    {
+					  condition += "AND";
+					  parsed_values += ",";
+				    }
 				}
-				}
-				string cmd = $"IF NOT EXISTS (SELECT {GetPrimarykeyColumnName(table)} FROM {table} WHERE {condition})";
-				cmd += $"INSERT {table}({fields}) VALUES ({parsed_values})";
+				string cmd = $"IF NOT EXISTS (SELECT {GetPrimaryKeyColumnName(table)} FROM {table} WHERE {condition})";
+				cmd += $"INSERT {table}({parsed_fields}) VALUES ({parsed_values})";
 				Insert(cmd);
 			}
 		}

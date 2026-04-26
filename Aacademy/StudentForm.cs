@@ -38,12 +38,19 @@ namespace Aacademy
 		*/
 		protected override void ButtonOK_Click(object sender, EventArgs e)
 		{
-			DataBase.Connector.Insert
-				(
-				"Students",
-				"last_name,first_name,middle_name,birth_date,email,phone,[group]",
-				$"{tbLastName.Text},{tbFirstName.Text},{tbMiddleName.Text},{dtpBirthDate.Value.ToString("dd-MM-yyyy")},{tbEmail.Text},{tbPhone.Text},{cbGroup.SelectedValue}"
-				);
+			try
+			{
+				DataBase.Connector.Insert
+					(
+					"Students",
+					"last_name,first_name,middle_name,birth_date,email,phone,[group]",
+					$"{tbLastName.Text},{tbFirstName.Text},{tbMiddleName.Text},{dtpBirthDate.Value.ToString("dd-MM-yyyy")},{tbEmail.Text},{tbPhone.Text},{cbGroup.SelectedValue}"
+					);
+			}
+			catch (Exception ex)
+			{
+				MessageBox.Show(this, ex.Message, "Error", MessageBoxButtons.OK);
+			}
 		}
 	}
 }
