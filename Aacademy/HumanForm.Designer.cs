@@ -238,6 +238,7 @@
 			this.Name = "HumanForm";
 			this.ShowInTaskbar = false;
 			this.Text = "HumanForm";
+			this.Load += new System.EventHandler(this.HumanForm_Load);
 			((System.ComponentModel.ISupportInitialize)(this.pbPhoto)).EndInit();
 			this.ResumeLayout(false);
 			this.PerformLayout();

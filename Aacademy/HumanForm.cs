@@ -12,9 +12,9 @@ using System.Configuration;
 
 namespace Aacademy
 {
-	public abstract partial class HumanForm : Form
+	public partial class HumanForm : Form
 	{
-		public HumanForm()
+		protected HumanForm()
 		{
 			InitializeComponent();
 			
@@ -25,8 +25,14 @@ namespace Aacademy
 
 		}
 
-		protected abstract void ButtonOK_Click(object sender, EventArgs e);
+		protected virtual void ButtonOK_Click(object sender, EventArgs e)
+		{
 
-	
+		}
+
+		private void HumanForm_Load(object sender, EventArgs e)
+		{
+
+		}
 	}
 }
