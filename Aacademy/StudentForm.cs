@@ -30,6 +30,14 @@ namespace Aacademy
 			cbGroup.DisplayMember = "group_name";
 			cbGroup.ValueMember = "group_id";
 		}
+		public StudentForm(int id) : this() 
+		{
+			DataTable data = DataBase.Connector.Select("*", "Students", $"stud_id={id}");
+			student = new Models.Student(data.Rows[0].ItemArray);
+			human = student;
+			Extract();
+			cbGroup.SelectedValue = student.group;
+		}
 		/*protected override void buttonOK_Click(object sender, EventArgs e)
 		{
 			DataBase.Connector.Insert
