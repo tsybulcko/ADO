@@ -13,6 +13,7 @@ namespace Aacademy
 {
 	public partial class StudentForm : HumanForm
 	{
+		internal Models.Student student;
 		public StudentForm()
 		{
 			InitializeComponent();
@@ -39,17 +40,9 @@ namespace Aacademy
 		*/
 		protected override void ButtonOK_Click(object sender, EventArgs e)
 		{
-			Models.Student student = new Models.Student
-				(
-				tbLastName.Text,
-				tbFirstName.Text,
-				tbMiddleName.Text,
-				dtpBirthDate.Value.ToString("yyyy-MM-dd"),
-				tbEmail.Text,
-				tbPhone.Text,
-				pbPhoto.Image,
-				Convert.ToInt32(cbGroup.SelectedValue)
-				);
+			base.ButtonOK_Click(sender, e);
+
+			student = new Models.Student(human,Convert.ToInt32(cbGroup.SelectedValue));
 			DataBase.Connector.Insert("Students", $"{student.GetNames()}", $"{student.GetValues()}");
 			//try
 			//{

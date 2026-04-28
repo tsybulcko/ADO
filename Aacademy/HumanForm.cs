@@ -14,6 +14,7 @@ namespace Aacademy
 {
 	public partial class HumanForm : Form
 	{
+		internal Models.Human human;
 		protected HumanForm()
 		{
 			InitializeComponent();
@@ -27,7 +28,16 @@ namespace Aacademy
 
 		protected virtual void ButtonOK_Click(object sender, EventArgs e)
 		{
-
+			human = new Models.Human
+				(
+				tbLastName.Text,
+				tbFirstName.Text,
+				tbMiddleName.Text,
+				dtpBirthDate.Value.ToString("yyyy-MM-dd"),
+				tbEmail.Text,
+				tbPhone.Text,
+				pbPhoto.Image
+				);
 		}
 
 		private void HumanForm_Load(object sender, EventArgs e)
