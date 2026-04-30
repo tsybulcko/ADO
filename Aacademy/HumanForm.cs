@@ -23,6 +23,7 @@ namespace Aacademy
 		{
 			if (human != null)
 			{
+				if(human.id != 0) labelID.Text = $"ID:{human.id}";
 				tbLastName.Text = human.last_name;
 				tbFirstName.Text = human.first_name;
 				tbMiddleName.Text = human.middle_name;
@@ -41,6 +42,7 @@ namespace Aacademy
 		{
 			human = new Models.Human
 				(
+				labelID.Text == "" ? 0 : Convert.ToInt32(labelID.Text.Split(':').Last()),
 				tbLastName.Text,
 				tbFirstName.Text,
 				tbMiddleName.Text,

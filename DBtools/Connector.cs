@@ -9,156 +9,172 @@ using System.Data;
 
 namespace DBtools
 {
-		public class Connector
+	public class Connector
+	{
+		string connection_string;
+		SqlConnection connection;
+		public Connector(string connection_string)
 		{
-			string connection_string;
-			SqlConnection connection;
-			public Connector(string connection_string)
-			{
-				Console.WriteLine(connection_string);
-				this.connection_string = connection_string;
-				connection = new SqlConnection(connection_string);
+			Console.WriteLine(connection_string);
+			this.connection_string = connection_string;
+			connection = new SqlConnection(connection_string);
 
-			}
-			public DataTable Select(string cmd)
-			{
-			    DataTable table = new DataTable();
-				connection.Open();
-				SqlCommand command = new SqlCommand(cmd, connection);
-				SqlDataReader reader = command.ExecuteReader();
+		}
+		public DataTable Select(string cmd)
+		{
+			DataTable table = new DataTable();
+			connection.Open();
+			SqlCommand command = new SqlCommand(cmd, connection);
+			SqlDataReader reader = command.ExecuteReader();
 			for (int i = 0; i < reader.FieldCount; i++)
 			{
 				Console.Write(reader.GetName(i) + "\t");
 				table.Columns.Add(reader.GetName(i));
 			}
-				Console.WriteLine();
-				while (reader.Read())
-				{
+			Console.WriteLine();
+			while (reader.Read())
+			{
 				DataRow row = table.NewRow();   //Создали строку
-					//Console.WriteLine($"{reader[0]}\t{reader[1]}\t{reader[2]}\t{reader[3]}");
-					for (int i = 0; i < reader.FieldCount; i++)
-				    {
-					    row[i] = reader[i]; //Заполнили строку значениями
-						Console.Write($"{reader[i]}\t\t");
-				    }
-					Console.WriteLine();
-				    table.Rows.Add(row); //Добавили заполненную строку в таблицу
+												//Console.WriteLine($"{reader[0]}\t{reader[1]}\t{reader[2]}\t{reader[3]}");
+				for (int i = 0; i < reader.FieldCount; i++)
+				{
+					row[i] = reader[i]; //Заполнили строку значениями
+					Console.Write($"{reader[i]}\t\t");
 				}
-				reader.Close();
-				connection.Close();
-			    return table;
+				Console.WriteLine();
+				table.Rows.Add(row); //Добавили заполненную строку в таблицу
 			}
-			public DataTable Select(string fields, string tables, string condition = "")
+			reader.Close();
+			connection.Close();
+			return table;
+		}
+		public DataTable Select(string fields, string tables, string condition = "")
+		{
+			string cmd = $"SELECT {fields} FROM {tables}";
+			if (condition != "") cmd += $" WHERE {condition}";
+			cmd += ";";
+			return Select(cmd);
+		}
+		public Dictionary<string, int> GetDictionary(string table, string condition = "")
+		{
+			Dictionary<string, int> dictionary = new Dictionary<string, int>();
+			string cmd =
+		$"SELECT {table.Substring(0, table.Length - 1)}_name,{table.Substring(0, table.Length - 1)}_id FROM {table}";
+			if (condition != "") cmd += $" WHERE {condition}";
+			SqlCommand command = new SqlCommand(cmd, connection);
+			connection.Open();
+			SqlDataReader reader = command.ExecuteReader();
+			while (reader.Read())
 			{
-				string cmd = $"SELECT {fields} FROM {tables}";
-				if (condition != "") cmd += $" WHERE {condition}";
-				cmd += ";";
-				return Select(cmd);
+				dictionary.Add(reader[0].ToString(), Convert.ToInt32(reader[1]));
 			}
-		    public Dictionary<string, int> GetDictionary(string table, string condition="")
-		    {
-			    Dictionary<string, int> dictionary = new Dictionary<string, int>();
-			    string cmd =
-			$"SELECT {table.Substring(0, table.Length-1)}_name,{table.Substring(0,table.Length-1)}_id FROM {table}";
-			    if (condition != "") cmd += $" WHERE {condition}";
-			    SqlCommand command = new SqlCommand(cmd, connection);
-			    connection.Open();
-			    SqlDataReader reader = command.ExecuteReader();
-			    while (reader.Read())
-			    {
-				   dictionary.Add(reader[0].ToString(), Convert.ToInt32(reader[1]));
-			    }
-			    reader.Close();
-			    connection.Close();
-			    return dictionary;
-		    }
-			public object Scalar(string cmd)
-			{
-				object result = null;
-				connection.Open();
-				SqlCommand command = new SqlCommand(cmd, connection);
-				result = command.ExecuteScalar(); //Выполнение скалярного запроса.
+			reader.Close();
+			connection.Close();
+			return dictionary;
+		}
+		public object Scalar(string cmd)
+		{
+			object result = null;
+			connection.Open();
+			SqlCommand command = new SqlCommand(cmd, connection);
+			result = command.ExecuteScalar(); //Выполнение скалярного запроса.
 
-				connection.Close();
-				return result;
-			}
-			public int GetMaxPrimareyKey(string table)
-			{
-				string cmd = $"SELECT * FROM {table}";
-				SqlCommand command = new SqlCommand(cmd, connection);
-				connection.Open();
-				SqlDataReader reader = command.ExecuteReader();
-				string pk_name = reader.GetName(0);
-				reader.Close();
-				connection.Close();
-				return (int)Scalar($"SELECT MAX({pk_name}) FROM {table}");
-			}
-			public int GetNextPrimaryKey(string table)
-			{
-				return GetMaxPrimareyKey(table) + 1;
-			}
-			public string GetPrimaryKeyColumnName(string table)
-			{
-				string raw = @"Raw string"; // Raw - строка игнорирует переносы.
-				string cmd = $@"SELECT INFORMATION_SCHEMA.KEY_COLUMN_USAGE.COLUMN_NAME
+			connection.Close();
+			return result;
+		}
+		public int GetMaxPrimareyKey(string table)
+		{
+			string cmd = $"SELECT * FROM {table}";
+			SqlCommand command = new SqlCommand(cmd, connection);
+			connection.Open();
+			SqlDataReader reader = command.ExecuteReader();
+			string pk_name = reader.GetName(0);
+			reader.Close();
+			connection.Close();
+			return (int)Scalar($"SELECT MAX({pk_name}) FROM {table}");
+		}
+		public int GetNextPrimaryKey(string table)
+		{
+			return GetMaxPrimareyKey(table) + 1;
+		}
+		public string GetPrimaryKeyColumnName(string table)
+		{
+			string raw = @"Raw string"; // Raw - строка игнорирует переносы.
+			string cmd = $@"SELECT INFORMATION_SCHEMA.KEY_COLUMN_USAGE.COLUMN_NAME
             FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE
             WHERE TABLE_NAME = N'{table}'
             AND CONSTRAINT_NAME LIKE N'PK_%'";
-				return (string)Scalar(cmd);
-			}
-			public void Insert(string cmd)
+			return (string)Scalar(cmd);
+		}
+		public void Insert(string cmd)
+		{
+			SqlCommand command = new SqlCommand(cmd, connection);
+			connection.Open();
+			try
 			{
-				SqlCommand command = new SqlCommand(cmd, connection);
-				connection.Open();
-				try
-				{
-					command.ExecuteNonQuery();
-				}
-				catch (Exception ex)
-				{
-
-					Console.WriteLine(ex.GetType());
-					Console.WriteLine(ex.Message);
-					if (ex.GetType() == typeof(SqlException) && ex.Message.Contains("_id"))
-					{
-						Console.WriteLine("Good");
-					}
-
-				}
-				connection.Close();
+				command.ExecuteNonQuery();
 			}
-			public void Insert(string table, string fields, string values)
+			catch (Exception ex)
 			{
-				string condition = "";
-				string[] s_fields = fields.Split(',');
-				string[] s_values = values.Split(',');
-			    string parsed_fields = "";
-			    string parsed_values = "";//$"N'{s_values[0]}',";
-				for (int i = s_fields[0].Contains("_id") ? 1 : 0; i < s_fields.Length; i++)
-				{
 
-				  condition += $" {s_fields[i]}={s_values[i]} ";
+				Console.WriteLine(ex.GetType());
+				Console.WriteLine(ex.Message);
+				if (ex.GetType() == typeof(SqlException) && ex.Message.Contains("_id"))
+				{
+					Console.WriteLine("Good");
+				}
+
+			}
+			connection.Close();
+		}
+		public void Insert(string table, string fields, string values)
+		{
+			string condition = "";
+			string[] s_fields = fields.Split(',');
+			string[] s_values = values.Split(',');
+			string parsed_fields = "";
+			string parsed_values = "";//$"N'{s_values[0]}',";
+			for (int i = s_fields[0].Contains("_id") ? 1 : 0; i < s_fields.Length; i++)
+			{
+
+				condition += $" {s_fields[i]}={s_values[i]} ";
 				if (i != s_fields.Length - 1) condition += " AND ";
 
 				///////////////////////////////////////////////////////////////////////////
 
-				 //   if (s_values[i] == "") continue;
-				 // condition += $" {s_fields[i]}=N'{s_values[i]}' ";
-				 //   parsed_fields += s_fields[i];
-				 //   if (i != s_fields.Length - 1) parsed_fields += ",";
-					//parsed_values += s_values[i].Length > 1 && s_values[i][0] != 'N' && s_values[i][1] != '\'' ? $"N'{s_values[i]}'" : s_values[i];
+				//   if (s_values[i] == "") continue;
+				// condition += $" {s_fields[i]}=N'{s_values[i]}' ";
+				//   parsed_fields += s_fields[i];
+				//   if (i != s_fields.Length - 1) parsed_fields += ",";
+				//parsed_values += s_values[i].Length > 1 && s_values[i][0] != 'N' && s_values[i][1] != '\'' ? $"N'{s_values[i]}'" : s_values[i];
 
-				 //   if (i != s_fields.Length - 1)
-				 //   {
-					//  condition += "AND";
-					//  parsed_values += ",";
-				 //   }
-				}
-				string cmd = $"IF NOT EXISTS (SELECT {GetPrimaryKeyColumnName(table)} FROM {table} WHERE {condition})";
-				cmd += $"INSERT {table}({fields}) VALUES ({values})";
-				Insert(cmd);
+				//   if (i != s_fields.Length - 1)
+				//   {
+				//  condition += "AND";
+				//  parsed_values += ",";
+				//   }
 			}
+			string cmd = $"IF NOT EXISTS (SELECT {GetPrimaryKeyColumnName(table)} FROM {table} WHERE {condition})";
+			cmd += $"INSERT {table}({fields}) VALUES ({values})";
+			Insert(cmd);
 		}
-	
+		public void Update(string cmd)
+		{
+			SqlCommand command = new SqlCommand(cmd, connection);
+			connection.Open();
+			command.ExecuteNonQuery();
+			connection.Close();
+		}
+		public void UploadPhoto(byte[] image, int id, string field, string table)
+		{
+			string cmd = $"UPDATE {table} SET {field}=@image WHERE {GetPrimaryKeyColumnName(table)}={id}"; //Это переметризованный запрос
+			SqlCommand command = new SqlCommand(cmd, connection);
+			command.Parameters.Add("@image", SqlDbType.VarBinary).Value = image;
+			connection.Open();
+			command.ExecuteNonQuery();
+			connection.Close();
+		}
+	}
+
 }
 
