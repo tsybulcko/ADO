@@ -131,10 +131,12 @@
 			// pbPhoto
 			// 
 			this.pbPhoto.BackColor = System.Drawing.SystemColors.AppWorkspace;
+			this.pbPhoto.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
 			this.pbPhoto.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
 			this.pbPhoto.Location = new System.Drawing.Point(463, 13);
 			this.pbPhoto.Name = "pbPhoto";
 			this.pbPhoto.Size = new System.Drawing.Size(154, 216);
+			this.pbPhoto.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
 			this.pbPhoto.TabIndex = 8;
 			this.pbPhoto.TabStop = false;
 			// 

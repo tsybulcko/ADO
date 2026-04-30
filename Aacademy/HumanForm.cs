@@ -35,7 +35,11 @@ namespace Aacademy
 
 		private void buttonBrowse_Click(object sender, EventArgs e)
 		{
-
+			OpenFileDialog dialog = new OpenFileDialog();
+			dialog.Filter =                               //Делаем фильтр для фото.
+				"JPG files (*.jpg)|*.jpg|PNG files (*.png)|*.png|All Image files|*.png;*.jpg|All files (*.*)|*.*";
+			if (dialog.ShowDialog() == DialogResult.OK ) 
+				pbPhoto.Image = Image.FromFile(dialog.FileName);
 		}
 
 		protected virtual void ButtonOK_Click(object sender, EventArgs e)
